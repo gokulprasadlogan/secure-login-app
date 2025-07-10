@@ -1150,6 +1150,16 @@
   resolved "https://registry.yarnpkg.com/@capacitor/ios/-/ios-7.4.1.tgz#8b2c2186fc9ddc9ed76ae53ffebb2a04d5839993"
   integrity sha512-KIvpCi2Hi5nWHGjGBLOCMrF46jDafu8s79dkZCPdK+4myy/pnzLpdj8xSic6umTHYOKThJMBYX42ZCBT2Cjt2w==
 
+"@capacitor/preferences@^7.0.1":
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/@capacitor/preferences/-/preferences-7.0.1.tgz#d1791a94fba8018497839fb7bd0bfa8b636dad6d"
+  integrity sha512-XF9jOHzvoIBZLwZr/EX6aVaUO1d8Mx7TwBLQS33pYHOliCW5knT5KUkFOXNNYxh9qqODYesee9xuQIKNJpQBag==
+
+"@capgo/capacitor-native-biometric@^7.1.7":
+  version "7.1.7"
+  resolved "https://registry.yarnpkg.com/@capgo/capacitor-native-biometric/-/capacitor-native-biometric-7.1.7.tgz#5081b87bf5c5c37ca147768cccb99467fb1cebd4"
+  integrity sha512-H0wvqYjuTWrf+ioy63ZGXtIDcoKDRvPlSD/gllWy9sRqFN0tb+AzgJxpoaoOsLYxPWNfxelJkjWlrUX1REtA2Q==
+
 "@csstools/normalize.css@*":
   version "12.1.1"
   resolved "https://registry.yarnpkg.com/@csstools/normalize.css/-/normalize.css-12.1.1.tgz#f0ad221b7280f3fc814689786fd9ee092776ef8f"
