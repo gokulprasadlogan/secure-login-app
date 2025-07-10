@@ -1,18 +1,21 @@
-// src/App.tsx
 import React, { useEffect, useState } from "react";
 import LoginScreen from "./screens/LoginScreen";
 import PinSetupScreen from "./screens/PinSetupScreen";
 import PinUnlockScreen from "./screens/PinUnlockScreen";
 import { getPIN, clearPIN } from "./storage/SecureStorage";
 import { Preferences } from "@capacitor/preferences";
+import BiometricAuth from "./components/BiometricAuth";
+import VConsole from "vconsole";
 
 const App: React.FC = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [pinExists, setPinExists] = useState(false);
   const [pinUnlocked, setPinUnlocked] = useState(false);
+  const [biometricTried, setBiometricTried] = useState(false);
   const [ready, setReady] = useState(false);
+  const vconsole = new VConsole();
 
-  // Load login + PIN state on startup
+  // Initial setup
   useEffect(() => {
     (async () => {
       const loginStatus = await Preferences.get({ key: "logged_in" });
@@ -28,30 +31,52 @@ const App: React.FC = () => {
   const handleLoginSuccess = async () => {
     await Preferences.set({ key: "logged_in", value: "true" });
     setLoggedIn(true);
+
+    // Optional: Store biometric credentials here if needed
+    // await NativeBiometric.setCredentials({ username: "...", password: "...", server: "..." });
   };
 
   const handleLogout = async () => {
     await Preferences.remove({ key: "logged_in" });
-    await clearPIN(); // Optional: reset PIN too
+    await clearPIN();
     setLoggedIn(false);
     setPinExists(false);
     setPinUnlocked(false);
+    setBiometricTried(false);
   };
 
+  // Wait for data to load
   if (!ready) return <p>Loading...</p>;
 
+  // Login
   if (!loggedIn) {
     return <LoginScreen onLoginSuccess={handleLoginSuccess} />;
   }
 
+  // PIN Setup
   if (loggedIn && !pinExists) {
     return <PinSetupScreen onPINSet={() => setPinExists(true)} />;
   }
 
+  // PIN Unlock with biometric check first
   if (loggedIn && pinExists && !pinUnlocked) {
-    return <PinUnlockScreen onUnlock={() => setPinUnlocked(true)} />;
+    return (
+      <>
+        {!biometricTried && (
+          <BiometricAuth
+            onSuccess={() => {
+              setPinUnlocked(true);
+              setBiometricTried(true);
+            }}
+            onFailure={() => setBiometricTried(true)}
+          />
+        )}
+        <PinUnlockScreen onUnlock={() => setPinUnlocked(true)} />
+      </>
+    );
   }
 
+  // Dashboard
   return (
     <div style={styles.container}>
       <div style={styles.card}>
