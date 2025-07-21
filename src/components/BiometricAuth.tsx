@@ -198,13 +198,12 @@ const BiometricAuth: React.FC<BiometricAuthProps> = ({
   const checkBiometricAvailability = async () => {
     try {
       const result = await NativeBiometric.isAvailable({ useFallback });
+      console.log("results", result);
 
       if (result.isAvailable) {
         setIsAvailable(true);
-        console.log("setBiometryType", result.biometryType);
         setBiometryType(result.biometryType);
-        console.log("biometryType", biometryType);
-        console.log(BiometryType.FINGERPRINT);
+
         // Don't automatically start - let user choose
       } else {
         setError(getBiometricErrorMessage(result.errorCode ?? 0));
@@ -235,7 +234,7 @@ const BiometricAuth: React.FC<BiometricAuthProps> = ({
       };
 
       // For Android, restrict to fingerprint only
-      if (biometryType === BiometryType.FINGERPRINT) {
+      if (biometryType === BiometryType.MULTIPLE) {
         authOptions.allowedBiometryTypes = [BiometryType.FINGERPRINT];
       }
 
