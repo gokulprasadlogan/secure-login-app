@@ -15,6 +15,7 @@ import { AuthService } from "./services/AuthService";
 import { Preferences } from "@capacitor/preferences";
 import BiometricAuth from "./components/BiometricAuth";
 import VConsole from "vconsole";
+import { App as CapacitorApp } from "@capacitor/app";
 
 const AppWrapper: React.FC = () => (
   <Router>
@@ -69,26 +70,25 @@ const App: React.FC = () => {
     })();
   }, []);
 
-  // // App resume handler (add this to your app lifecycle if needed)
-  // useEffect(() => {
-  //   const handleAppResume = async () => {
-  //     if (loggedIn && !pinUnlocked) {
-  //       // App was backgrounded and resumed, reset PIN unlock state
-  //       setPinUnlocked(false);
-  //       setBiometricTried(false);
+  useEffect(() => {
+    const handleAppStateChange = async (state: { isActive: boolean }) => {
+      if (state.isActive && loggedIn && !pinUnlocked) {
+        setPinUnlocked(false);
+        setBiometricTried(false);
+        await checkAuthStatus();
+      }
+    };
 
-  //       // Optionally recheck tokens
-  //       await checkAuthStatus();
-  //     }
-  //   };
+    const registerListener = () => {
+      CapacitorApp.addListener("appStateChange", handleAppStateChange);
+    };
 
-  //   // You would typically add this to Capacitor's App plugin
-  //   // App.addListener('appStateChange', handleAppResume);
+    registerListener();
 
-  //   return () => {
-  //     // App.removeListener('appStateChange', handleAppResume);
-  //   };
-  // }, [loggedIn, pinUnlocked]);
+    return () => {
+      CapacitorApp.removeAllListeners(); // or use removeListener if you stored the listener reference
+    };
+  }, [loggedIn, pinUnlocked]);
 
   useEffect(() => {
     if (!ready) return;
