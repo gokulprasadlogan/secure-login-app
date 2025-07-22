@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>secure-login</string>
+	<string>secure-login</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -45,7 +45,19 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+
 	<key>NSFaceIDUsageDescription</key>
-    <string>This app uses Face ID to securely authenticate you.</string>
+	<string>This app uses Face ID to securely authenticate you.</string>
+	<key>keychain-access-groups</key>
+<array>
+    <string>$(AppIdentifierPrefix)$(CFBundleIdentifier)</string>
+</array>
+
 </dict>
 </plist>

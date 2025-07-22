@@ -1,5 +1,6 @@
-// src/screens/LoginScreen.tsx
 import React, { useState } from "react";
+import { AuthService } from "../services/AuthService";
+import { saveEmail } from "../storage/SecureStorage";
 
 interface Props {
   onLoginSuccess: () => void;
@@ -9,12 +10,27 @@ const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    if (email === "test@example.com" && password === "123456") {
-      onLoginSuccess();
-    } else {
-      setError("Invalid credentials");
+  const handleLogin = async () => {
+    if (loading) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const tokens = await AuthService.login(email, password);
+
+      if (tokens) {
+        await saveEmail(email); // 🔧 store email for PIN login
+        onLoginSuccess();
+      } else {
+        setError("Invalid credentials");
+      }
+    } catch (err: any) {
+      setError(err.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -27,6 +43,7 @@ const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          disabled={loading}
         />
         <br />
         <input
@@ -34,9 +51,12 @@ const LoginScreen: React.FC<Props> = ({ onLoginSuccess }) => {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          disabled={loading}
         />
         <br />
-        <button onClick={handleLogin}>Login</button>
+        <button onClick={handleLogin} disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
       </div>
     </div>
   );
@@ -47,7 +67,7 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    height: "100vh", // full height of viewport
+    height: "100vh",
     backgroundColor: "#f9f9f9",
   },
   card: {

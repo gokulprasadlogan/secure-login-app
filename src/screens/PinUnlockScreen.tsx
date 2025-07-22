@@ -1,21 +1,32 @@
-// src/screens/PinUnlockScreen.tsx
 import React, { useState } from "react";
-import { getPIN } from "../storage/SecureStorage";
+import { AuthService } from "../services/AuthService";
+import { getEmail, getPIN } from "../storage/SecureStorage";
 
 interface Props {
   onUnlock: () => void;
+  onForgotPin: () => void;
 }
 
-const PinUnlockScreen: React.FC<Props> = ({ onUnlock }) => {
+const PinUnlockScreen: React.FC<Props> = ({ onUnlock, onForgotPin }) => {
   const [input, setInput] = useState("");
   const [error, setError] = useState("");
 
   const handleUnlock = async () => {
-    const savedPIN = await getPIN();
-    if (input === savedPIN) {
-      onUnlock();
-    } else {
-      setError("Incorrect PIN");
+    try {
+      const email = await getEmail();
+      const pin = await getPIN();
+
+      if (!email || !pin) {
+        throw new Error("Missing stored credentials");
+      }
+
+      const { accessToken } = await AuthService.pinLogin(email, pin);
+      if (accessToken) {
+        onUnlock(); // navigate to home
+      }
+    } catch (err) {
+      console.error("PIN unlock failed", err);
+      // fallback to full login screen
     }
   };
 
@@ -32,6 +43,10 @@ const PinUnlockScreen: React.FC<Props> = ({ onUnlock }) => {
         />
         <br />
         <button onClick={handleUnlock}>Unlock</button>
+        <br />
+        <button onClick={onForgotPin} style={{ ...styles.forgotButton }}>
+          Forgot PIN? Login with Email/Password
+        </button>
       </div>
     </div>
   );
@@ -42,7 +57,7 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    height: "100vh", // full height of viewport
+    height: "100vh",
     backgroundColor: "#f9f9f9",
   },
   card: {
@@ -51,6 +66,12 @@ const styles = {
     borderRadius: "8px",
     backgroundColor: "#fff",
     boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+  },
+  forgotButton: {
+    backgroundColor: "transparent",
+    border: "1px solid #007bff",
+    color: "#007bff",
+    marginTop: "10px",
   },
 };
 
